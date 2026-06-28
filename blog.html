@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Blog Page</title>
+</head>
+
+<body style="
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#1e3c72,#2a5298);
+min-height:100vh;
+">
+
+
+<div style="
+text-align:center;
+padding:20px;
+color:white;
+font-size:26px;
+font-weight:bold;
+">
+My Blog Platform 🚀
+</div>
+
+
+<div style="
+width:90%;
+max-width:800px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
+">
+
+
+<h2 style="color:#1e3c72;text-align:center;">Create Post</h2>
+
+  <input id="title" placeholder="Post Title" style="
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:8px;
+    outline:none;
+  ">
+
+  <textarea id="content" placeholder="Post Content" style="
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:1px solid #ccc;
+    border-radius:8px;
+    outline:none;
+    height:100px;
+    resize:none;
+  "></textarea>
+
+  <button onclick="createPost()" style="
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:linear-gradient(90deg,#1e3c72,#2a5298);
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+  ">
+    Add Post 🚀
+  </button>
+
+</div>
+
+
+<div id="posts" style="
+width:90%;
+max-width:800px;
+margin:20px auto;
+"></div>
+
+<script>
+
+const user_id = localStorage.getItem("user_id");
+
+
+async function loadPosts() {
+  const res = await fetch("http://localhost:3000/posts");
+  const data = await res.json();
+
+  document.getElementById("posts").innerHTML =
+    data.map(post => `
+      <div style="
+        background:white;
+        padding:15px;
+        margin:10px 0;
+        border-radius:12px;
+        box-shadow:0 5px 15px rgba(0,0,0,0.2);
+      ">
+        <h3 style="color:#1e3c72;">${post.title}</h3>
+        <p>${post.content}</p>
+
+        <button onclick="deletePost(${post.id})" style="
+          padding:8px 12px;
+          border:none;
+          border-radius:6px;
+          background:red;
+          color:white;
+          cursor:pointer;
+        ">
+          Delete 🗑️
+        </button>
+      </div>
+    `).join("");
+}
+
+
+async function createPost() {
+  const title = document.getElementById("title").value;
+  const content = document.getElementById("content").value;
+
+  await fetch("http://localhost:3000/posts", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ title, content, user_id })
+  });
+
+  document.getElementById("title").value = "";
+  document.getElementById("content").value = "";
+
+  loadPosts();
+}
+
+
+async function deletePost(id) {
+  await fetch("http://localhost:3000/posts/" + id, {
+    method: "DELETE"
+  });
+
+  loadPosts();
+}
+
+loadPosts();
+
+</script>
+
+</body>
+</html>
